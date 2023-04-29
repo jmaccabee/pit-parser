@@ -1,6 +1,10 @@
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.views import View
 
 from mango.models import MangoProduct, MangoProductFile
+
+import pandas as pd
 
 
 def index(request):
@@ -20,5 +24,11 @@ def view_product_data_files(request, id):
     )
 
 
-def label_data_file(request, product_id, id):
-    return render(request, "label_data_file.html")
+class LabelDataFileView(View):
+    template_name = "label_data_file.html"
+
+    def get(self, request, product_id, id):
+        # TO DO - COMPLETE VIEW
+        # data_file = MangoProductFile.objects.get(id=id).data_file
+
+        return render(request, "label_data_file.html")

@@ -19,7 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from .views import index, label_data_file, view_product_data_files
+from .views import index, LabelDataFileView, view_product_data_files
+from parser_backend.views import process_data_file
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -31,8 +32,13 @@ urlpatterns = [
         name="view_product_data_files",
     ),
     path(
-        "products/<uuid:product_id>/datafiles/<uuid:id>",
-        label_data_file,
+        "products/<uuid:product_id>/datafiles/<uuid:id>/label",
+        LabelDataFileView.as_view(),
         name="label_data_file",
+    ),
+    path(
+        "products/<uuid:product_id>/datafiles/<uuid:id>/process",
+        process_data_file,
+        name="process_data_file",
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

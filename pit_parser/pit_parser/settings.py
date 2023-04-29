@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # first party apps
+    "base",
     "mango",
+    "parser_backend",
     # third party apps
     "compressor",
     # development apps
