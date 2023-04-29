@@ -1,6 +1,23 @@
-<!-- templates/index.html -->
+<!-- templates/view_product.html -->
 
 {% extends "_base.html" %}
 
 {% block content %}
+
+    <div>
+        <span class="px-4 py-2 text-base text-gray-700">Select a data file to label</span>
+        <ul class="w-72 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        {% for file in files %}
+           <li class="w-full px-4 py-2 border-b border-gray-200 rounded-t-lg dark:border-gray-600">
+              <a href="{% url 'label_data_file' product_id=product_id id=file.id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{file.filename}}</a>
+           </li>
+        {% endfor %}
+        {% if not files %}
+           <li class="w-full px-4 py-2 border-b border-gray-200 rounded-t-lg dark:border-gray-600 bg-slate-100">
+              <span class="text-slate-500">(No data files found)</span>
+           </li>
+        {% endif %}
+        </ul>
+    </div>
+
 {% endblock content %}

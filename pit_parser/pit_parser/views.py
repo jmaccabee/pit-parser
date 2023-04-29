@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from mango.models import MangoProduct
+from mango.models import MangoProduct, MangoProductFile
 
 
 def index(request):
@@ -9,4 +9,16 @@ def index(request):
 
 
 def view_product_data_files(request, id):
-    return render(request, "view_product.html", {"id": id})
+    files = MangoProductFile.objects.filter(mango_product_id=id)
+    return render(
+        request,
+        "view_product.html",
+        {
+            "files": files,
+            "product_id": id,
+        },
+    )
+
+
+def label_data_file(request, product_id, id):
+    return render(request, "label_data_file.html")
