@@ -37,7 +37,7 @@ urlpatterns = [
         name="label_data_file",
     ),
     path(
-        "products/<uuid:product_id>/datafiles/<uuid:id>/process",
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/process",
         process_data_file,
         name="process_data_file",
     ),
