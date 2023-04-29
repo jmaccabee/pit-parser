@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import models
 
 from base.models import BaseModel
@@ -17,14 +15,4 @@ class ExtractedPitData(BaseModel):
     source_data_file_name = models.CharField(max_length=1024)
     date = models.DateField()
     value = models.DecimalField(max_digits=36, decimal_places=10)
-    timeseries_id = models.UUIDField(null=False, blank=False)
-
-    def save(self, *args, **kwargs):
-        self.timeseries_id = uuid.uuid3(
-            uuid.NAMESPACE_URL,
-            (
-                f"{self.raw_analysis_name}{self.slice_value}"
-                f"{self.section_header_1}{self.section_header_2}"
-            ),
-        )
-        super(ExtractedPitData, self).save(*args, **kwargs)
+    timeseries_id = models.UUIDField()
