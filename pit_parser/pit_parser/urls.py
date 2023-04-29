@@ -15,8 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
-from .views import index
+from .views import index, view_product_data_files
 
-urlpatterns = [path("admin/", admin.site.urls), path("", index, name="index")]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("__reload__/", include("django_browser_reload.urls")),
+    path("", index, name="index"),
+    path(
+        "products/<uuid:mango_product_id>",
+        view_product_data_files,
+        name="view_product_data_files",
+    ),
+]
