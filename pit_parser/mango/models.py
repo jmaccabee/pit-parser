@@ -15,6 +15,9 @@ class MangoProduct(BaseModel):
     id = models.CharField(max_length=36, primary_key=True)
     name = models.CharField(max_length=128)
 
+    def __str__(self):
+        return self.name
+
 
 class MangoProductFile(BaseModel):
     mango_product_id = models.ForeignKey(MangoProduct, on_delete=models.CASCADE)

@@ -161,3 +161,4 @@ cython_debug/
 
 node_modules/
 pit_parser/static/
+pit_parser/media/*
