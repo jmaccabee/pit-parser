@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "compressor",
 ]
 
@@ -56,7 +55,7 @@ ROOT_URLCONF = "pit_parser.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates'],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -127,4 +126,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # compressor settings
 COMPRESS_ROOT = BASE_DIR / "static"
 COMPRESS_ENABLED = True
-STATICFILE_FINDERS = ("compressor.finders.CompressorFinder", )
+STATICFILE_FINDERS = ("compressor.finders.CompressorFinder",)
