@@ -12,5 +12,10 @@ class BaseModel(models.Model):
 
 
 class MangoProduct(BaseModel):
-    mango_product_id = models.CharField(max_length=36)
-    mango_product_name = models.CharField(max_length=128)
+    id = models.CharField(max_length=36, primary_key=True)
+    name = models.CharField(max_length=128)
+
+
+class MangoProductFile(BaseModel):
+    mango_product_id = models.ForeignKey(MangoProduct, on_delete=models.CASCADE)
+    data_file = models.FileField(upload_to="datafiles")

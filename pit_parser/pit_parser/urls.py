@@ -14,6 +14,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
@@ -24,8 +26,8 @@ urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path("", index, name="index"),
     path(
-        "products/<uuid:mango_product_id>",
+        "products/<uuid:id>",
         view_product_data_files,
         name="view_product_data_files",
     ),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

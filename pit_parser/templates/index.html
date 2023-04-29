@@ -8,7 +8,7 @@
       <ul class="w-48 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
       {% for product in products %}
          <li class="w-full px-4 py-2 border-b border-gray-200 rounded-t-lg dark:border-gray-600">
-            <a href="{% url 'view_product_data_files' mango_product_id=product.mango_product_id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{product.mango_product_name}}</a>
+            <a href="{% url 'view_product_data_files' id=product.id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{product.name}}</a>
          </li>
       {% endfor %}
       </ul>
