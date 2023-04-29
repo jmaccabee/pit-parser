@@ -22,3 +22,6 @@ class MangoProduct(BaseModel):
 class MangoProductFile(BaseModel):
     mango_product_id = models.ForeignKey(MangoProduct, on_delete=models.CASCADE)
     data_file = models.FileField(upload_to="datafiles")
+
+    def __str__(self):
+        return self.data_file.name.split("/")[1]
