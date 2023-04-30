@@ -1,3 +1,4 @@
+from django import forms
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -32,6 +33,34 @@ class AnnotateDataFileCreateView(CreateView):
     template_name = "annotate_data_file.html"
     form_class = AnnotationForm
     model = ProcessedPitData
+
+    # def get(self, request, *args, **kwargs):
+    #     mango_product_id = kwargs['mango_product_id']
+    #     metrics = [
+    #         (record, record)
+    #         for record in (
+    #             MangoProductAnnotation.objects
+    #                 .filter(mango_product=mango_product_id)
+    #                 .filter(field_label=MangoProductAnnotation.METRIC_NAME)
+    #                 .values_list("field_value")
+    #                 .distinct()
+    #         )
+    #     ]
+    #     slices = [
+    #         (record, record)
+    #         for record in (
+    #             MangoProductAnnotation.objects
+    #                 .filter(mango_product=mango_product_id)
+    #                 .filter(field_label=MangoProductAnnotation.SLICE_NAME)
+    #                 .values_list("field_value")
+    #                 .distinct()
+    #         )
+    #     ]
+    #     import pdb; pdb.set_trace()
+    #     form = self.get_form()
+    #     form.fields['metric_label'] = forms.ChoiceField(choices=metrics)
+    #     form.fields['slice_label'] = forms.ChoiceField(choices=slices)
+    #     return super(AnnotateDataFileCreateView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         mango_product_file_id = self.kwargs["mango_product_file_id"]
