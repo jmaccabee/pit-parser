@@ -13,10 +13,10 @@
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" class="px-6 py-3 min-w-fit">
-                            Raw Analysis Name
+                            Legacy Raw Analysis Name
                         </th>
                         <th scope="col" class="px-6 py-3 min-w-fit">
-                            Slice Value
+                            Legacy Slice Value
                         </th>                        
                         {% for date in dates %}
                         <th scope="col" class="px-6 py-3">
@@ -70,9 +70,16 @@
         <form class="space-y-6" method="post">{% csrf_token %}
             <h5 class="text-xl font-medium text-gray-900 dark:text-white">Data File Annotations</h5>
                 <div class="grid md:grid-cols-3 md:gap-6">
-                {% for fm in form %}
+                {% for fm in form.visible_fields %}
                     <div class="float-left">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{fm.label}}</label>
+                        <div>
+                            {{fm}}
+                        </div>
+                    </div>
+                {% endfor %}
+                {% for fm in form.hidden_fields %}
+                    <div class="float-left">
                         <div>
                             {{fm}}
                         </div>

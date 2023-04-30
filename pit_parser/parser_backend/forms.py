@@ -1,4 +1,5 @@
 from django.forms import ModelForm, TextInput
+from django.forms.widgets import HiddenInput
 
 from parser_backend.models import ProcessedPitData
 
@@ -6,7 +7,11 @@ from parser_backend.models import ProcessedPitData
 class AnnotationForm(ModelForm):
     class Meta:
         model = ProcessedPitData
-        exclude = ["mango_product_file", "timeseries_id"]
+        fields = "__all__"
+        widgets = {
+            "mango_product_file": HiddenInput(),
+            "timeseries_id": HiddenInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

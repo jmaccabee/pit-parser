@@ -1,7 +1,8 @@
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from mango.models import MangoProduct, MangoProductFile, MangoProductAnnotation
 from parser_backend.models import ExtractedPitData, ProcessedPitData
@@ -30,6 +31,16 @@ def view_product_data_files(request, id):
 class AnnotateDataFileCreateView(CreateView):
     template_name = "annotate_data_file.html"
     form_class = AnnotationForm
+    model = ProcessedPitData
+
+    def post(self, request, *args, **kwargs):
+        mango_product_file_id = self.kwargs["mango_product_file_id"]
+        timeseries_id = self.request.POST["timeseries_id"]
+        ExtractedPitData.objects.filter(
+            mango_product_file_id=mango_product_file_id,
+            timeseries_id=timeseries_id,
+        ).update(annotated=ExtractedPitData.ANNOTATED)
+        return super(AnnotateDataFileCreateView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AnnotateDataFileCreateView, self).get_context_data(**kwargs)
@@ -40,24 +51,33 @@ class AnnotateDataFileCreateView(CreateView):
             ExtractedPitData.objects.filter(
                 mango_product_file__id=mango_product_file_id
             )
-            .filter(annotated=False)
+            .exclude(annotated=ExtractedPitData.ANNOTATED)
+            .order_by("annotated")
             .values("timeseries_id")
             .distinct()
             .first()
-        )["timeseries_id"]
+        )
+        if not next_timeseries_id_to_annotate:
+            return redirect(
+                "annotation_complete",
+                mango_product_id=mango_product_id,
+                mango_product_file_id=mango_product_file_id,
+            )
+
+        timeseries_id = next_timeseries_id_to_annotate["timeseries_id"]
+
         timeseries_to_annotate = (
             ExtractedPitData.objects.filter(
                 mango_product_file__id=mango_product_file_id
-            ).filter(timeseries_id=next_timeseries_id_to_annotate)
-        )[:5]
+            )
+            .filter(timeseries_id=timeseries_id)
+            .exclude(Q(raw_value="-") | Q(raw_value="nan"))
+        )[:5:-1]
 
         first_datapoint = timeseries_to_annotate[0]
-        date_strings = sorted(
-            [
-                datapoint.date.strftime("%Y-%m-%d")
-                for datapoint in timeseries_to_annotate
-            ]
-        )
+        date_strings = [
+            datapoint.date.strftime("%Y-%m-%d") for datapoint in timeseries_to_annotate
+        ]
         values = [datapoint.raw_value for datapoint in timeseries_to_annotate]
 
         mango_annotations = MangoProductAnnotation.objects.filter(
@@ -85,11 +105,50 @@ class AnnotateDataFileCreateView(CreateView):
                 "slice_names": slice_names,
                 "mango_product_id": mango_product_id,
                 "mango_product_file_id": mango_product_file_id,
-                "timeseries_id": next_timeseries_id_to_annotate,
+                "timeseries_id": timeseries_id,
             }
         )
-
         return context
+
+    def get_initial(self):
+        mango_product_file_id = self.kwargs["mango_product_file_id"]
+        mango_product_id = self.kwargs["mango_product_id"]
+        next_timeseries_id_to_annotate = (
+            ExtractedPitData.objects.filter(
+                mango_product_file__id=mango_product_file_id
+            )
+            .exclude(annotated=ExtractedPitData.ANNOTATED)
+            .order_by("annotated")
+            .values("timeseries_id")
+            .distinct()
+            .first()
+        )
+        if not next_timeseries_id_to_annotate:
+            return redirect(
+                "annotation_complete",
+                mango_product_id=mango_product_id,
+                mango_product_file_id=mango_product_file_id,
+            )
+
+        timeseries_id = next_timeseries_id_to_annotate["timeseries_id"]
+
+        self.initial.update(
+            {
+                "mango_product_file": mango_product_file_id,
+                "timeseries_id": timeseries_id,
+                "value_scaler": 0,
+            }
+        )
+        return self.initial
+
+    def get_success_url(self):
+        return reverse(
+            "create_annotate_data_file",
+            kwargs={
+                "mango_product_id": self.object.mango_product_file.mango_product_id,
+                "mango_product_file_id": self.object.mango_product_file_id,
+            },
+        )
 
 
 class AnnotateDataFileUpdateView(UpdateView):
@@ -120,3 +179,7 @@ def skip_annotation(
         mango_product_id=mango_product_id,
         mango_product_file_id=mango_product_file_id,
     )
+
+
+def annotation_complete(request, mango_product_id, mango_product_file_id):
+    return render(request, "labels_complete.html")

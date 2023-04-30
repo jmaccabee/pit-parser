@@ -73,4 +73,4 @@ class ProcessedPitData(BaseModel):
     dates_start_period = models.BooleanField(default=False)
 
     mango_product_file = models.ForeignKey(MangoProductFile, on_delete=models.CASCADE)
-    timeseries_id = models.UUIDField()
+    timeseries_id = models.UUIDField(unique=True)

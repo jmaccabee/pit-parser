@@ -23,6 +23,7 @@ from .views import (
     AnnotateDataFileCreateView,
     AnnotateDataFileUpdateView,
     AnnotateDataFileDeleteView,
+    annotation_complete,
     index,
     skip_annotation,
     view_product_data_files,
@@ -62,5 +63,10 @@ urlpatterns = [
         "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/process/",
         process_data_file,
         name="process_data_file",
+    ),
+    path(
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/complete",
+        annotation_complete,
+        name="annotation_complete",
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
