@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from .views import index, LabelDataFileView, view_product_data_files
+from .views import index, AnnotateDataFileView, view_product_data_files
 from parser_backend.views import process_data_file
 
 urlpatterns = [
@@ -32,9 +32,9 @@ urlpatterns = [
         name="view_product_data_files",
     ),
     path(
-        "products/<uuid:product_id>/datafiles/<uuid:id>/label",
-        LabelDataFileView.as_view(),
-        name="label_data_file",
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate",
+        AnnotateDataFileView.as_view(),
+        name="annotate_data_file",
     ),
     path(
         "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/process",

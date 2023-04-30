@@ -2,7 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
-from mango.models import MangoProduct, MangoProductFile
+from mango.models import MangoProduct, MangoProductFile, MangoProductAnnotation
+from parser_backend.models import ExtractedPitData
 
 import pandas as pd
 
@@ -24,11 +25,59 @@ def view_product_data_files(request, id):
     )
 
 
-class LabelDataFileView(View):
-    template_name = "label_data_file.html"
+class AnnotateDataFileView(View):
+    template_name = "annotate_data_file.html"
 
-    def get(self, request, product_id, id):
-        # TO DO - COMPLETE VIEW
-        # data_file = MangoProductFile.objects.get(id=id).data_file
+    def get(self, request, mango_product_id, mango_product_file_id):
+        next_timeseries_id_to_annotate = (
+            ExtractedPitData.objects.filter(
+                mango_product_file__id=mango_product_file_id
+            )
+            .filter(annotated=False)
+            .values("timeseries_id")
+            .distinct()
+            .first()
+        )["timeseries_id"]
+        timeseries_to_annotate = (
+            ExtractedPitData.objects.filter(
+                mango_product_file__id=mango_product_file_id
+            ).filter(timeseries_id=next_timeseries_id_to_annotate)
+        )[:5]
 
-        return render(request, "label_data_file.html")
+        first_datapoint = timeseries_to_annotate[0]
+        date_strings = sorted(
+            [
+                datapoint.date.strftime("%Y-%m-%d")
+                for datapoint in timeseries_to_annotate
+            ]
+        )
+        values = [datapoint.raw_value for datapoint in timeseries_to_annotate]
+
+        mango_annotations = MangoProductAnnotation.objects.filter(
+            mango_product_id=mango_product_id
+        ).order_by("field_value")
+        metric_names = [
+            a.field_value
+            for a in mango_annotations
+            if a.field_label == MangoProductAnnotation.METRIC_NAME
+        ]
+        slice_names = [
+            a.field_value
+            for a in mango_annotations
+            if a.field_label == MangoProductAnnotation.SLICE_NAME
+        ]
+
+        return render(
+            request,
+            "annotate_data_file.html",
+            {
+                "section_header_1": first_datapoint.section_header_1,
+                "section_header_2": first_datapoint.section_header_2,
+                "raw_analysis_name": first_datapoint.raw_analysis_name,
+                "slice_value": first_datapoint.slice_value,
+                "dates": date_strings,
+                "values": values,
+                "metric_names": metric_names,
+                "slice_names": slice_names,
+            },
+        )

@@ -29,12 +29,12 @@
                              {{file.filename}}
                          </th>
                          <td class="px-6 py-4">
-                             {{file.is_processed}}
+                             <span>{{file.get_status_display}}</span>
                          </td>
                          <td class="px-6 py-4">
-                              {% if file.is_processed %}
-                                 <a href="{% url 'label_data_file' product_id=product_id id=file.id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Label</button>
+                              {% if file.status == 3 %}
+                                 <a href="{% url 'annotate_data_file' mango_product_id=product_id mango_product_file_id=file.id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                    <button type="button" class="text-gray-900 bg-blue-400 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Annotate</button>
                                  </a>
                               {% else %}
                                  <a href="{% url 'process_data_file' mango_product_id=product_id mango_product_file_id=file.id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">

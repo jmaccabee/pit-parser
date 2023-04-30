@@ -1,0 +1,130 @@
+<!-- templates/annotate_data_file.html -->
+
+{% extends "_base.html" %}
+
+{% block content %}
+<div>
+    <div class="container mx-auto bg-slate-200 items-center p-4 mt-4">
+        <div class="relative overflow-x-auto">
+            <div class="text-sm pb-4">
+                <span class="font-bold">{{section_header_1}} - {{section_header_2}}</span>
+            </div>
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 min-w-fit">
+                            Raw Analysis Name
+                        </th>
+                        <th scope="col" class="px-6 py-3 min-w-fit">
+                            Slice Value
+                        </th>                        
+                        {% for date in dates %}
+                        <th scope="col" class="px-6 py-3">
+                            {{date}}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <th scope="row" class="px-6 py-4 font-light text-gray-900 whitespace-nowrap dark:text-white">
+                            {{raw_analysis_name}}
+                        </th>
+                        <th scope="row" class="px-6 py-4 font-light text-gray-900 whitespace-nowrap dark:text-white">
+                            {{slice_value}}
+                        </th>
+                        {% for value in values %}
+                        <td class="px-6 py-4">
+                            {{value|floatformat:4}}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container mx-auto bg-slate-200 items-center p-4 mt-4 grid md:grid-cols-2 md:gap-4 float-left">
+        <div class="container mx-auto w-full max-w h-full grid md:grid-rows-2 md:gap-4">
+            <div class="container mx-auto w-full max-w h-56 px-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 overflow-y-auto">
+                <div class="container mx-auto w-full sticky top-0 bg-white">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white bg-white mt-2 sticky top-0">Metrics Feed Metrics</h2>
+                </div>
+                <ul class="max-w-md mt-2 text-gray-500 list-none list-inside dark:text-gray-400">
+                    {% for metric in metric_names %}
+                        <li>{{metric}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="container mx-auto w-full max-w h-56 px-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 overflow-y-auto">
+                <div class="container mx-auto w-full sticky top-0 bg-white">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white bg-white mt-2 sticky top-0">Metrics Feed Slice Names</h2>
+                </div>
+                <ul class="max-w-md mt-2 text-gray-500 list-none list-inside dark:text-gray-400">
+                    {% for slice in slice_names %}
+                        <li>{{slice}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="w-full max-w p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:gap-8 dark:bg-gray-800 dark:border-gray-700">
+            <form class="space-y-6" action="#">
+                <h5 class="text-xl font-medium text-gray-900 dark:text-white">Data File Annotations</h5>
+                <div class="grid md:grid-cols-3 md:gap-6">
+                    <div class="float-left">
+                        <label for="metric_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Metric name</label>
+                        <input name="metric_name" id="metric_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required>
+                    </div>
+                    <div class="float-left">
+                        <label for="metric_label" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Metric label</label>
+                        <input name="metric_label" id="metric_label" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                    <div class="float-left">
+                        <label for="value_scaler" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Value scaler</label>
+                        <input name="value_scaler" id="value_scaler" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-3 md:gap-6">
+                    <div class="float-left">
+                        <label for="slice_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slice name</label>
+                        <input name="slice_name" id="slice_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required>
+                    </div>
+                    <div class="float-left">
+                        <label for="slice_label" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slice label</label>
+                        <input name="slice_label" id="slice_label" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                    <div class="float-left">
+                        <label for="periodicity" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Periodicity</label>
+                        <input name="periodicity" id="periodicity" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>                    
+                </div>
+                <div class="grid md:grid-cols-3 md:gap-6">
+                    <div class="float-left">
+                        <label for="slice_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slice name</label>
+                        <input name="slice_name" id="slice_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="" required>
+                    </div>
+                    <div class="float-left">
+                        <label for="slice_label" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slice label</label>
+                        <input name="slice_label" id="slice_label" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                    <div class="float-left">
+                        <label for="period_end_timedelta" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Period end time delta</label>
+                        <input name="period_end_timedelta" id="period_end_timedelta" placeholder="" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="date_end_period" type="checkbox" value="" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" required>
+                        </div>
+                        <label for="date_end_period" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Dates end period?</label>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 md:gap-6">
+                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create Annotation</button>
+                    <button type="submit" class="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-300 dark:focus:ring-gray-800  w-full">Skip</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

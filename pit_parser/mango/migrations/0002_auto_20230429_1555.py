@@ -11,7 +11,9 @@ from mango.models import MangoProduct
 
 def create_mango_products(apps, schema_editor):
     with open(
-        os.path.join(settings.MEDIA_ROOT, "mango_data", "mango_products.csv")
+        os.path.join(
+            settings.MEDIA_ROOT, "mango_data", "mango_products", "mango_products.csv"
+        )
     ) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
