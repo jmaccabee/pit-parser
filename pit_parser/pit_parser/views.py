@@ -1,9 +1,11 @@
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.views import View
+from django.shortcuts import render, redirect
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.urls import reverse_lazy
 
 from mango.models import MangoProduct, MangoProductFile, MangoProductAnnotation
-from parser_backend.models import ExtractedPitData
+from parser_backend.models import ExtractedPitData, ProcessedPitData
+from parser_backend.forms import AnnotationForm
 
 import pandas as pd
 
@@ -25,10 +27,15 @@ def view_product_data_files(request, id):
     )
 
 
-class AnnotateDataFileView(View):
+class AnnotateDataFileCreateView(CreateView):
     template_name = "annotate_data_file.html"
+    form_class = AnnotationForm
 
-    def get(self, request, mango_product_id, mango_product_file_id):
+    def get_context_data(self, **kwargs):
+        context = super(AnnotateDataFileCreateView, self).get_context_data(**kwargs)
+        mango_product_file_id = context["view"].kwargs["mango_product_file_id"]
+        mango_product_id = context["view"].kwargs["mango_product_id"]
+
         next_timeseries_id_to_annotate = (
             ExtractedPitData.objects.filter(
                 mango_product_file__id=mango_product_file_id
@@ -66,10 +73,7 @@ class AnnotateDataFileView(View):
             for a in mango_annotations
             if a.field_label == MangoProductAnnotation.SLICE_NAME
         ]
-
-        return render(
-            request,
-            "annotate_data_file.html",
+        context.update(
             {
                 "section_header_1": first_datapoint.section_header_1,
                 "section_header_2": first_datapoint.section_header_2,
@@ -79,5 +83,40 @@ class AnnotateDataFileView(View):
                 "values": values,
                 "metric_names": metric_names,
                 "slice_names": slice_names,
-            },
+                "mango_product_id": mango_product_id,
+                "mango_product_file_id": mango_product_file_id,
+                "timeseries_id": next_timeseries_id_to_annotate,
+            }
         )
+
+        return context
+
+
+class AnnotateDataFileUpdateView(UpdateView):
+    model = ProcessedPitData
+    template_name = "annotate_data_file.html"
+    form_class = AnnotationForm
+
+
+class AnnotateDataFileDeleteView(DeleteView):
+    model = ProcessedPitData
+    success_url = reverse_lazy("create_annotate_data_file")
+    template_name = "annotate_data_file.html"
+    form_class = AnnotationForm
+
+
+def skip_annotation(
+    request,
+    mango_product_id,
+    mango_product_file_id,
+    timeseries_id,
+):
+    ExtractedPitData.objects.filter(
+        mango_product_file_id=mango_product_file_id,
+        timeseries_id=timeseries_id,
+    ).update(annotated=ExtractedPitData.SKIPPED)
+    return redirect(
+        "create_annotate_data_file",
+        mango_product_id=mango_product_id,
+        mango_product_file_id=mango_product_file_id,
+    )

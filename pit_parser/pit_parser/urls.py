@@ -19,7 +19,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from .views import index, AnnotateDataFileView, view_product_data_files
+from .views import (
+    AnnotateDataFileCreateView,
+    AnnotateDataFileUpdateView,
+    AnnotateDataFileDeleteView,
+    index,
+    skip_annotation,
+    view_product_data_files,
+)
 from parser_backend.views import process_data_file
 
 urlpatterns = [
@@ -27,17 +34,32 @@ urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path("", index, name="index"),
     path(
-        "products/<uuid:id>",
+        "products/<uuid:id>/",
         view_product_data_files,
         name="view_product_data_files",
     ),
     path(
-        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate",
-        AnnotateDataFileView.as_view(),
-        name="annotate_data_file",
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/",
+        AnnotateDataFileCreateView.as_view(),
+        name="create_annotate_data_file",
     ),
     path(
-        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/process",
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/<uuid:id>/",
+        AnnotateDataFileUpdateView.as_view(),
+        name="update_annotate_data_file",
+    ),
+    path(
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/<uuid:timeseries_id>/skip/",
+        skip_annotation,
+        name="skip_annotate_data_file",
+    ),
+    path(
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/<uuid:id>/delete/",
+        AnnotateDataFileDeleteView.as_view(),
+        name="delete_annotate_data_file",
+    ),
+    path(
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/process/",
         process_data_file,
         name="process_data_file",
     ),
