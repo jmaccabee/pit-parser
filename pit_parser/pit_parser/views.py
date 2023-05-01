@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.db.models import Q
 from django.http import HttpResponse
@@ -76,6 +78,11 @@ class AnnotateDataFileCreateView(CreateView):
         )[:5:-1]
 
         first_datapoint = timeseries_to_annotate[0]
+        raw_analysis_name = first_datapoint.raw_analysis_name
+        slice_value = first_datapoint.slice_value
+        section_header_1 = first_datapoint.section_header_1
+        section_header_2 = first_datapoint.section_header_2
+
         date_strings = [
             datapoint.date.strftime("%Y-%m-%d") for datapoint in timeseries_to_annotate
         ]
@@ -101,10 +108,10 @@ class AnnotateDataFileCreateView(CreateView):
         ]
         context.update(
             {
-                "section_header_1": first_datapoint.section_header_1,
-                "section_header_2": first_datapoint.section_header_2,
-                "raw_analysis_name": first_datapoint.raw_analysis_name,
-                "slice_value": first_datapoint.slice_value,
+                "section_header_1": section_header_1,
+                "section_header_2": section_header_2,
+                "raw_analysis_name": raw_analysis_name,
+                "slice_value": slice_value,
                 "dates": date_strings,
                 "values": values,
                 "metric_names": metric_names,
@@ -140,38 +147,46 @@ class AnnotateDataFileCreateView(CreateView):
                 }
             ),
         )
-        return context
 
-    def get_initial(self):
-        mango_product_file_id = self.kwargs["mango_product_file_id"]
-        mango_product_id = self.kwargs["mango_product_id"]
-        next_timeseries_id_to_annotate = (
-            ExtractedPitData.objects.filter(
-                mango_product_file__id=mango_product_file_id
-            )
-            .exclude(annotated=ExtractedPitData.ANNOTATED)
-            .order_by("annotated")
-            .values("timeseries_id")
-            .distinct()
-            .first()
-        )
-        if not next_timeseries_id_to_annotate:
-            return redirect(
-                "annotation_complete",
-                mango_product_id=mango_product_id,
-                mango_product_file_id=mango_product_file_id,
-            )
+        # move to helper functions
+        value_scaler = 0
+        if re.search("\\(\\$?mm\\)", slice_value.lower()) or re.search(
+            "\\(\\$?mm\\)", raw_analysis_name.lower()
+        ):
+            value_scaler = 1000000
+        elif re.search("thousand", slice_value.lower()) or re.search(
+            "thousand", raw_analysis_name.lower()
+        ):
+            value_scaler = 1000
 
-        timeseries_id = next_timeseries_id_to_annotate["timeseries_id"]
-
-        self.initial.update(
+        # move to helper functions
+        first_date_obj = timeseries_to_annotate[0]
+        second_date_obj = timeseries_to_annotate[1]
+        if "q" in first_date_obj.raw_date.lower():
+            periodicity = ProcessedPitData.QUARTERLY
+        else:
+            first_date = first_date_obj.date
+            second_date = second_date_obj.date
+            delta = abs(second_date - first_date).days
+            if delta > 30:
+                periodicity = ProcessedPitData.ANNUALLY
+            elif delta > 7:
+                periodicity = ProcessedPitData.MONTHLY
+            elif delta > 1:
+                periodicity = ProcessedPitData.WEEKLY
+            else:
+                periodicity = ProcessedPitData.DAILY
+        context["form"].initial.update(
             {
+                "metric_field": "raw_analysis_name",
+                "slice_field": "slice_value",
+                "periodicity": periodicity,
                 "mango_product_file": mango_product_file_id,
                 "timeseries_id": timeseries_id,
-                "value_scaler": 0,
+                "value_scaler": value_scaler,
             }
         )
-        return self.initial
+        return context
 
     def get_success_url(self):
         return reverse(

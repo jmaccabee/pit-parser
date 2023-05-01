@@ -18,7 +18,7 @@ class ExtractedPitData(BaseModel):
 
     mango_product_file = models.ForeignKey(MangoProductFile, on_delete=models.CASCADE)
     raw_analysis_name = models.CharField(max_length=1024)
-    slice_value = models.CharField(max_length=1024)
+    slice_value = models.CharField(max_length=1024, null=True)
     section_header_1 = models.CharField(max_length=1024)
     section_header_2 = models.CharField(max_length=1024)
     source_sheet_name = models.CharField(max_length=1024)
