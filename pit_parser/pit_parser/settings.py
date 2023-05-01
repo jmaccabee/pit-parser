@@ -130,11 +130,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_URL = "/static/"
+STATIC_ROOT = "/Users/joshmaccabee/Development/pit-parser/dist/"
+STATICFILES_DIRS = [BASE_DIR / "static/"]
 
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -142,8 +143,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # compressor settings
-COMPRESS_ROOT = BASE_DIR / "static"
-COMPRESS_ENABLED = True
+COMPRESS_ROOT = BASE_DIR / "static/"
+COMPRESS_ENABLED = not DEBUG
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
