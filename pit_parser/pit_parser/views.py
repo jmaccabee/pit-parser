@@ -34,34 +34,6 @@ class AnnotateDataFileCreateView(CreateView):
     form_class = AnnotationForm
     model = ProcessedPitData
 
-    # def get(self, request, *args, **kwargs):
-    #     mango_product_id = kwargs['mango_product_id']
-    #     metrics = [
-    #         (record, record)
-    #         for record in (
-    #             MangoProductAnnotation.objects
-    #                 .filter(mango_product=mango_product_id)
-    #                 .filter(field_label=MangoProductAnnotation.METRIC_NAME)
-    #                 .values_list("field_value")
-    #                 .distinct()
-    #         )
-    #     ]
-    #     slices = [
-    #         (record, record)
-    #         for record in (
-    #             MangoProductAnnotation.objects
-    #                 .filter(mango_product=mango_product_id)
-    #                 .filter(field_label=MangoProductAnnotation.SLICE_NAME)
-    #                 .values_list("field_value")
-    #                 .distinct()
-    #         )
-    #     ]
-    #     import pdb; pdb.set_trace()
-    #     form = self.get_form()
-    #     form.fields['metric_label'] = forms.ChoiceField(choices=metrics)
-    #     form.fields['slice_label'] = forms.ChoiceField(choices=slices)
-    #     return super(AnnotateDataFileCreateView, self).get(request, *args, **kwargs)
-
     def post(self, request, *args, **kwargs):
         mango_product_file_id = self.kwargs["mango_product_file_id"]
         timeseries_id = self.request.POST["timeseries_id"]
@@ -69,10 +41,10 @@ class AnnotateDataFileCreateView(CreateView):
             mango_product_file_id=mango_product_file_id,
             timeseries_id=timeseries_id,
         ).update(annotated=ExtractedPitData.ANNOTATED)
-        return super(AnnotateDataFileCreateView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(AnnotateDataFileCreateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         mango_product_file_id = context["view"].kwargs["mango_product_file_id"]
         mango_product_id = context["view"].kwargs["mango_product_id"]
 
@@ -122,6 +94,11 @@ class AnnotateDataFileCreateView(CreateView):
             for a in mango_annotations
             if a.field_label == MangoProductAnnotation.SLICE_NAME
         ]
+        empty_choice = [("", "---------")]
+        metric_choices = empty_choice + [(metric, metric) for metric in metric_names]
+        slice_choices = empty_choice + [
+            (slice_name, slice_name) for slice_name in slice_names
+        ]
         context.update(
             {
                 "section_header_1": first_datapoint.section_header_1,
@@ -136,6 +113,32 @@ class AnnotateDataFileCreateView(CreateView):
                 "mango_product_file_id": mango_product_file_id,
                 "timeseries_id": timeseries_id,
             }
+        )
+        context["form"].fields["metric_label"] = forms.ChoiceField(
+            choices=metric_choices,
+            widget=forms.Select(
+                attrs={
+                    "class": (
+                        "bg-gray-50 border border-gray-300 text-gray-900 "
+                        "text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 "
+                        "block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 "
+                        "dark:placeholder-gray-400 dark:text-white"
+                    )
+                }
+            ),
+        )
+        context["form"].fields["slice_label"] = forms.ChoiceField(
+            choices=slice_choices,
+            widget=forms.Select(
+                attrs={
+                    "class": (
+                        "bg-gray-50 border border-gray-300 text-gray-900 "
+                        "text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 "
+                        "block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 "
+                        "dark:placeholder-gray-400 dark:text-white"
+                    )
+                }
+            ),
         )
         return context
 

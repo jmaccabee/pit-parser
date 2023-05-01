@@ -1,6 +1,7 @@
 <!-- templates/annotate_data_file.html -->
 
 {% extends "_base.html" %}
+{% load humanize %}
 
 {% block content %}
 <div>
@@ -38,7 +39,7 @@
                         </th>
                         {% for value in values %}
                         <td class="px-6 py-4">
-                            {{value|floatformat:4}}
+                            {{value|floatformat:4|intcomma}}
                         </td>
                         {% endfor %}
                     </tr>
@@ -47,28 +48,6 @@
         </div>
     </div>
     <div class="container mx-auto bg-slate-200 items-center p-4 mt-4 grid md:grid-cols-2 md:gap-4 float-left">
-        <div class="container mx-auto w-full max-w h-full grid md:grid-rows-2 md:gap-4">
-            <div class="container mx-auto w-full max-w h-56 px-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 overflow-y-auto">
-                <div class="container mx-auto w-full sticky top-0 bg-white">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white bg-white mt-2 sticky top-0">Metrics Feed Metrics</h2>
-                </div>
-                <ul class="max-w-md mt-2 text-gray-500 list-none list-inside dark:text-gray-400">
-                    {% for metric in metric_names %}
-                        <li>{{metric}}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="container mx-auto w-full max-w h-56 px-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 overflow-y-auto">
-                <div class="container mx-auto w-full sticky top-0 bg-white">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white bg-white mt-2 sticky top-0">Metrics Feed Slice Names</h2>
-                </div>
-                <ul class="max-w-md mt-2 text-gray-500 list-none list-inside dark:text-gray-400">
-                    {% for slice in slice_names %}
-                        <li>{{slice}}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
         <div class="w-full max-w bg-white border border-gray-200 rounded-lg shadow sm:px-6 md:gap-8 dark:bg-gray-800 dark:border-gray-700">
         <form class="space-y-6" method="post">{% csrf_token %}
             <h5 class="text-xl font-medium text-gray-900 dark:text-white">Data File Annotations</h5>

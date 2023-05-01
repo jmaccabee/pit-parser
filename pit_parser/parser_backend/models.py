@@ -69,7 +69,6 @@ class ProcessedPitData(BaseModel):
     slice_field = models.CharField(max_length=32, choices=FIELD_CHOICES)
     slice_label = models.CharField(max_length=1024)
     periodicity = models.CharField(max_length=32, choices=PERIODICITY_CHOICES)
-    period_end_time_delta = models.SmallIntegerField()
     dates_start_period = models.BooleanField(default=False)
 
     mango_product_file = models.ForeignKey(MangoProductFile, on_delete=models.CASCADE)
