@@ -3,31 +3,17 @@ import os
 
 from django.conf import settings
 
-from mango.models import MangoProduct, MangoProductAnnotation
 
-
-def create_mango_annotations(mango_metrics_filename):
+def create_objects_from_source_file(source_filepath):
     with open(
         os.path.join(
             settings.MEDIA_ROOT,
-            "mango_data",
-            "mango_metrics",
-            mango_metrics_filename,
+            source_filepath,
         )
     ) as csvfile:
         reader = csv.DictReader(csvfile)
-        first_row = next(reader)
-        mango_product = MangoProduct.objects.get(name=first_row["product_name"])
-        MangoProductAnnotation.objects.create(
-            mango_product=mango_product,
-            field_label=first_row["field_label"],
-            field_value=first_row["field_value"],
-            calculation_type=first_row["calculation_type"],
-        )
-        for row in reader:
-            MangoProductAnnotation.objects.create(
-                mango_product=mango_product,
-                field_label=row["field_label"],
-                field_value=row["field_value"],
-                calculation_type=row["calculation_type"],
-            )
+        while reader:
+            try:
+                yield next(reader)
+            except StopIteration:
+                return
