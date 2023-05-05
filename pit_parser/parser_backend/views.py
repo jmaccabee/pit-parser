@@ -28,7 +28,7 @@ def process_data_file(request, mango_product_id, mango_product_file_id):
                     source_data_file_name=record.file_name.replace("-staging", ""),
                     raw_date=record.date_header,
                     raw_value=record.value,
-                    annotated=False,
+                    annotated=ExtractedPitData.UNANNOTATED,
                     timeseries_id=uuid.uuid3(
                         uuid.NAMESPACE_URL,
                         (

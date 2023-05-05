@@ -1,7 +1,7 @@
 import re
 
 from django import forms
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -20,12 +20,35 @@ def index(request):
 
 
 def view_product_data_files(request, id):
-    files = MangoProductFile.objects.filter(mango_product_id=id)
+    files = MangoProductFile.objects.filter(mango_product_id=id).order_by("id")
+    file_ids = [f.id for f in files]
+    timeseries_annotations = (
+        ExtractedPitData.objects.filter(mango_product_file_id__in=file_ids)
+        .values("mango_product_file_id", "annotated")
+        .annotate(distinct_timeseries=Count("timeseries_id", distinct=True))
+        .order_by("mango_product_file_id", "annotated")
+    )
+    annotation_display_names = {
+        choice[0]: choice[1]
+        for choice in ExtractedPitData.annotated.field.get_choices()[1:]
+    }
+    data_file_context = {}
+    for status in timeseries_annotations:
+        if not status["mango_product_file_id"] in data_file_context.keys():
+            data_file_context[status["mango_product_file_id"]] = []
+            context = data_file_context[status["mango_product_file_id"]]
+        context.append(
+            (
+                annotation_display_names[status["annotated"]],
+                status["distinct_timeseries"],
+            )
+        )
     return render(
         request,
         "view_product.html",
         {
             "files": files,
+            "data_file_context": data_file_context,
             "product_id": id,
         },
     )
@@ -169,7 +192,7 @@ class AnnotateDataFileCreateView(CreateView):
             second_date = second_date_obj.date
             delta = abs(second_date - first_date).days
             if delta > 30:
-                periodicity = ProcessedPitData.ANNUALLY
+                periodicity = ProcessedPitData.YEARLY
             elif delta > 7:
                 periodicity = ProcessedPitData.MONTHLY
             elif delta > 1:
