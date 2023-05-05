@@ -27,7 +27,6 @@ class ExtractedPitData(BaseModel):
     raw_value = models.CharField(max_length=32)
     timeseries_id = models.UUIDField()
     annotated = models.IntegerField(choices=ANNOTATION_CHOICES, default=1)
-    publication_date = models.DateField(null=True, blank=True)
 
     @property
     def date(self):
