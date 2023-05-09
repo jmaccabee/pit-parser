@@ -19,6 +19,19 @@ def index(request):
     return render(request, "index.html", {"products": mango_products})
 
 
+def remaining_view(request):
+    remaining_annotations = (
+        ExtractedPitData.objects.values(
+            "mango_product_file__mango_product__name",
+            "mango_product_file__mango_product_id",
+            "annotated",
+        )
+        .annotate(distinct_timeseries=Count("timeseries_id", distinct=True))
+        .order_by("mango_product_file__mango_product__name", "annotated")
+    )
+    return render(request, "remaining.html", {"annotations": remaining_annotations})
+
+
 def view_product_data_files(request, id):
     files = MangoProductFile.objects.filter(mango_product_id=id).order_by("id")
     file_ids = [f.id for f in files]
@@ -36,7 +49,7 @@ def view_product_data_files(request, id):
     for status in timeseries_annotations:
         if not status["mango_product_file_id"] in data_file_context.keys():
             data_file_context[status["mango_product_file_id"]] = []
-            context = data_file_context[status["mango_product_file_id"]]
+        context = data_file_context[status["mango_product_file_id"]]
         context.append(
             (
                 annotation_display_names[status["annotated"]],

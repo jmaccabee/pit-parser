@@ -25,6 +25,7 @@ from .views import (
     AnnotateDataFileDeleteView,
     annotation_complete,
     index,
+    remaining_view,
     skip_annotation,
     view_product_data_files,
 )
@@ -65,8 +66,13 @@ urlpatterns = [
         name="process_data_file",
     ),
     path(
-        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/complete",
+        "products/<uuid:mango_product_id>/datafiles/<uuid:mango_product_file_id>/annotate/complete/",
         annotation_complete,
         name="annotation_complete",
+    ),
+    path(
+        "products/remaining/",
+        remaining_view,
+        name="remaining_view",
     ),
 ] + staticfiles_urlpatterns()
